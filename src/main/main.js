@@ -97,7 +97,7 @@ function parseCli(argv) {
 
 function cliUsage() {
   return [
-    '用法：MDView --export <文件.md> [选项]',
+    '用法：MarkForge --export <文件.md> [选项]',
     '',
     '选项：',
     '  --to, --format <列表>   导出格式，逗号分隔：html / pdf / docx（默认 html）',
@@ -109,8 +109,8 @@ function cliUsage() {
     '  -h, --help              显示帮助',
     '',
     '示例：',
-    '  MDView --export report.md --to pdf',
-    '  MDView --export report.md --to pdf,docx -o dist/',
+    '  MarkForge --export report.md --to pdf',
+    '  MarkForge --export report.md --to pdf,docx -o dist/',
   ].join('\n');
 }
 
@@ -255,7 +255,7 @@ function sendOpen(file) {
     const content = fs.readFileSync(file, 'utf8');
     store.pushRecent(file);
     send('app:openFile', { path: file, content });
-    if (mainWin) mainWin.setTitle(path.basename(file) + ' - MDView');
+    if (mainWin) mainWin.setTitle(path.basename(file) + ' - MarkForge');
   } catch (e) {
     dialog.showErrorBox('打开失败', String(e.message));
   }
@@ -395,7 +395,7 @@ function menuTemplate() {
         { label: 'Markdown 语法速查', click: cmd('help.syntax') },
         { label: '公式与图表示例', click: cmd('help.samples') },
         { type: 'separator' },
-        { label: '关于 MDView', click: cmd('help.about') },
+        { label: '关于 MarkForge', click: cmd('help.about') },
       ],
     },
   ];
@@ -414,7 +414,7 @@ function createWindow() {
     minWidth: 880,
     minHeight: 600,
     show: false,
-    title: 'MDView',
+    title: 'MarkForge',
     backgroundColor: store.get('theme') === 'dark' ? '#1b1d23' : '#ffffff',
     webPreferences: {
       preload: path.join(app.getAppPath(), 'src', 'preload', 'preload.js'),
@@ -605,7 +605,7 @@ function registerIpc() {
   ipcMain.handle('dialog:message', async (_e, opts = {}) => {
     const r = await dialog.showMessageBox(mainWin, {
       type: opts.type || 'info',
-      title: opts.title || 'MDView',
+      title: opts.title || 'MarkForge',
       message: opts.message || '',
       detail: opts.detail,
       buttons: opts.buttons || ['确定'],
@@ -618,7 +618,7 @@ function registerIpc() {
   ipcMain.handle('dialog:confirmSave', async (_e, name) => {
     const r = await dialog.showMessageBox(mainWin, {
       type: 'warning',
-      title: 'MDView',
+      title: 'MarkForge',
       message: `“${name}” 尚未保存，是否保存？`,
       buttons: ['保存', '不保存', '取消'],
       defaultId: 0,
@@ -798,7 +798,27 @@ function registerIpc() {
 /* ------------------------------------------------------------------ *
  * 生命周期
  * ------------------------------------------------------------------ */
+/**
+ * 从旧版本（MDView）迁移用户数据。
+ * 改名后 userData 目录会变成 %APPDATA%\MarkForge，
+ * 这里在新目录还没有 settings.json 时，把旧目录整体复制过来，
+ * 保证设置、草稿、最近文件不丢。
+ */
+function migrateLegacyUserData() {
+  try {
+    const current = app.getPath('userData');
+    const legacy = path.join(app.getPath('appData'), 'MDView');
+    if (legacy === current) return;
+    if (fs.existsSync(path.join(current, 'settings.json'))) return;
+    if (!fs.existsSync(legacy)) return;
+    fs.cpSync(legacy, current, { recursive: true, force: false, errorOnExist: false });
+  } catch {
+    /* 迁移失败不影响启动 */
+  }
+}
+
 app.whenReady().then(async () => {
+  migrateLegacyUserData();
   store = new Store(app.getPath('userData'));
   nativeTheme.themeSource = store.get('theme') === 'dark' ? 'dark' : 'light';
   registerIpc();
@@ -835,7 +855,7 @@ app.on('window-all-closed', () => {
 
 process.on('uncaughtException', (err) => {
   try {
-    dialog.showErrorBox('MDView 发生错误', String(err && err.stack ? err.stack : err));
+    dialog.showErrorBox('MarkForge 发生错误', String(err && err.stack ? err.stack : err));
   } catch {
     /* ignore */
   }

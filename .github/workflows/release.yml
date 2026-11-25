@@ -39,9 +39,9 @@ jobs:
       - name: 创建 Release 并上传产物
         uses: softprops/action-gh-release@v2
         with:
-          name: MDView ${{ github.ref_name }}
+          name: MarkForge ${{ github.ref_name }}
           draft: false
           generate_release_notes: true
           files: |
-            release/MDView Setup *.exe
-            release/MDView-*-portable.exe
+            release/MarkForge Setup *.exe
+            release/MarkForge-*-portable.exe

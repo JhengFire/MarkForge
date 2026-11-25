@@ -755,9 +755,9 @@ class DocxBuilder {
   async toBuffer() {
     const children = this.build();
     const doc = new Document({
-      creator: this.meta.author || 'MDView',
+      creator: this.meta.author || 'MarkForge',
       title: this.meta.title || '未命名文档',
-      description: '由 MDView 导出',
+      description: '由 MarkForge 导出',
       numbering: this.numberingConfig(),
       styles: {
         default: {

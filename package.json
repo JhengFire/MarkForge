@@ -1,10 +1,10 @@
 {
-  "name": "mdview",
-  "productName": "MDView",
+  "name": "markforge",
+  "productName": "MarkForge",
   "version": "1.0.0",
-  "description": "MDView - 支持 Mermaid / PlantUML / KaTeX 的 Markdown 编辑器与阅读器，可导出 Word / PDF / HTML 并一键打印",
+  "description": "MarkForge - 支持 Mermaid / PlantUML / KaTeX 的 Markdown 编辑器与阅读器，可导出 Word / PDF / HTML 并一键打印",
   "main": "dist/main.js",
-  "author": "MDView",
+  "author": "MarkForge",
   "license": "MIT",
   "private": true,
   "scripts": {
@@ -25,8 +25,8 @@
     "test:mindmap": "node test/mindmap.js"
   },
   "build": {
-    "appId": "com.mdview.app",
-    "productName": "MDView",
+    "appId": "com.markforge.app",
+    "productName": "MarkForge",
     "directories": {
       "output": "release",
       "buildResources": "build"
@@ -61,10 +61,10 @@
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "MDView"
+      "shortcutName": "MarkForge"
     },
     "portable": {
-      "artifactName": "MDView-${version}-portable.exe"
+      "artifactName": "MarkForge-${version}-portable.exe"
     }
   },
   "dependencies": {

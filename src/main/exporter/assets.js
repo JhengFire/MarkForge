@@ -135,7 +135,7 @@ function buildStandaloneHtml(o = {}) {
   parts.push('<head>');
   parts.push('<meta charset="utf-8">');
   parts.push('<meta name="viewport" content="width=device-width,initial-scale=1">');
-  parts.push('<meta name="generator" content="MDView">');
+  parts.push('<meta name="generator" content="MarkForge">');
   parts.push(`<title>${escapeHtml(o.title || '未命名文档')}</title>`);
   if (meta.author) parts.push(`<meta name="author" content="${escapeHtml(meta.author)}">`);
   parts.push('<style>');

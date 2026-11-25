@@ -36,7 +36,7 @@ const S = {
   lastRenderOk: true,
 };
 
-const DEFAULT_DOC = `# 欢迎使用 MDView
+const DEFAULT_DOC = `# 欢迎使用 MarkForge
 
 这是一个支持 **Mermaid**、**PlantUML** 与 **LaTeX 公式** 的 Markdown 编辑器，编辑与预览同步进行，并可一键打印、导出为 **Word / PDF / HTML**。
 
@@ -182,7 +182,7 @@ mindmap
 skinparam backgroundColor #FFFFFF
 skinparam shadowing false
 actor 用户 as U
-participant "MDView" as M
+participant "MarkForge" as M
 database "本地文件" as F
 U -> M : 打开 .md
 M -> F : 读取
@@ -304,11 +304,11 @@ function selfCheckVendorLibs() {
   if (!window.hljs) missing.push('highlight.js（代码高亮）');
   if (!window.mermaid) missing.push('Mermaid（图表）');
   if (!missing.length) {
-    console.info('[MDView] 本地库自检通过：KaTeX / highlight.js / Mermaid');
+    console.info('[MarkForge] 本地库自检通过：KaTeX / highlight.js / Mermaid');
     return;
   }
   console.error(
-    '[MDView] 本地库未加载：' + missing.join('、') +
+    '[MarkForge] 本地库未加载：' + missing.join('、') +
       '。请确认 vendor/ 目录完整（可执行 npm run vendor 重新生成）。'
   );
   toast('本地资源未加载：' + missing.join('、'), 'err', 6000);
@@ -1230,7 +1230,7 @@ function renderAboutPane(body) {
   body.innerHTML = '';
   const tb = el('table', { style: { width: '100%', fontSize: '13px', borderCollapse: 'collapse' } });
   const rows = [
-    ['版本', 'MDView v' + i.version],
+    ['版本', 'MarkForge v' + i.version],
     ['运行环境', `Electron ${i.electron} · Chromium ${i.chrome} · Node ${i.node}`],
     ['平台', i.platform],
     ['配置文件目录', i.userData],

@@ -63,12 +63,12 @@ const extraCss = `
 
 /* 4) 组装单文件 HTML（CSS / KaTeX 字体 / 图片全部内联） */
 const out = assets.buildStandaloneHtml({
-  title: 'MDView 渲染示例',
+  title: 'MarkForge 渲染示例',
   bodyHtml: body,
   baseDir: root,
   theme: 'light',
   meta: {
-    author: 'MDView',
+    author: 'MarkForge',
     codeHighlight: true,
     codeTheme: 'github',
     contentWidth: 860,

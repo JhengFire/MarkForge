@@ -109,7 +109,7 @@ function main() {
     outDir = path.join(releaseDir, 'build-' + stamp());
     console.warn('');
     console.warn('[dist] 旧产物既删不掉也改不了名，本次改写到：' + path.relative(root, outDir));
-    console.warn('[dist] 建议先退出正在运行的 MDView，再清理 release/ 下的残留目录。');
+    console.warn('[dist] 建议先退出正在运行的 MarkForge，再清理 release/ 下的残留目录。');
     console.warn('');
   }
 
