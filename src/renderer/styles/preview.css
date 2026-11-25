@@ -1,0 +1,476 @@
+/* ==========================================================================
+   MDView — 文档正文样式（实时预览 / 导出 HTML / 打印共用）
+   通过 [data-theme="light|dark"] 切换主题
+   ========================================================================== */
+
+:root {
+  --bg: #ffffff;
+  --fg: #1f2328;
+  --fg-soft: #3d444d;
+  --muted: #6a737d;
+  --border: #d8dee4;
+  --border-soft: #eaeef2;
+  --accent: #0a6ad4;
+  --accent-soft: #ddf4ff;
+  --code-bg: #f6f8fa;
+  --code-fg: #24292f;
+  --quote-bg: #f7f9fb;
+  --table-head: #f6f8fa;
+  --table-stripe: #fcfdfe;
+  --mark-bg: #fff6bf;
+  --kbd-bg: #f6f8fa;
+  --shadow: 0 1px 3px rgba(20, 25, 35, 0.07);
+
+  --font-body: "Segoe UI", "Microsoft YaHei UI", "Microsoft YaHei", "PingFang SC",
+    -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+  --font-heading: var(--font-body);
+  --font-mono: "Cascadia Mono", "Cascadia Code", Consolas, "JetBrains Mono",
+    "SFMono-Regular", "Courier New", monospace;
+  --font-serif: Georgia, "Times New Roman", "Songti SC", "SimSun", serif;
+
+  --md-font-size: 16px;
+  --md-line-height: 1.75;
+  --md-max-width: 860px;
+}
+
+[data-theme="dark"] {
+  --bg: #17191d;
+  --fg: #e6e8eb;
+  --fg-soft: #c9ced6;
+  --muted: #8b939e;
+  --border: #343941;
+  --border-soft: #262a30;
+  --accent: #62a8ff;
+  --accent-soft: #16324f;
+  --code-bg: #1e2126;
+  --code-fg: #d7dbe0;
+  --quote-bg: #1c2026;
+  --table-head: #1e2126;
+  --table-stripe: #1b1e23;
+  --mark-bg: #52471b;
+  --kbd-bg: #22262c;
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.markdown-body,
+.export-body {
+  font-family: var(--font-body);
+  font-size: var(--md-font-size);
+  line-height: var(--md-line-height);
+  color: var(--fg);
+  background: var(--bg);
+  word-wrap: break-word;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.markdown-body {
+  max-width: var(--md-max-width);
+  margin: 0 auto;
+  padding: 28px 32px 88px;
+  overflow-wrap: break-word;
+}
+
+.markdown-body.font-serif,
+.markdown-body.font-serif .markdown-body { font-family: var(--font-serif); }
+
+/* ------------------------------- 标题 ------------------------------- */
+.markdown-body h1,
+.markdown-body h2,
+.markdown-body h3,
+.markdown-body h4,
+.markdown-body h5,
+.markdown-body h6 {
+  font-family: var(--font-heading);
+  font-weight: 650;
+  line-height: 1.35;
+  margin: 1.6em 0 0.7em;
+  color: var(--fg);
+  scroll-margin-top: 24px;
+  position: relative;
+}
+.markdown-body > *:first-child { margin-top: 0; }
+.markdown-body h1 { font-size: 2em; padding-bottom: 0.3em; border-bottom: 1px solid var(--border-soft); }
+.markdown-body h2 { font-size: 1.55em; padding-bottom: 0.28em; border-bottom: 1px solid var(--border-soft); }
+.markdown-body h3 { font-size: 1.28em; }
+.markdown-body h4 { font-size: 1.1em; }
+.markdown-body h5 { font-size: 1em; }
+.markdown-body h6 { font-size: 0.92em; color: var(--muted); }
+
+/* 锚点：鼠标悬停才显现 */
+.markdown-body .header-anchor {
+  position: absolute;
+  left: -0.85em;
+  width: 0.85em;
+  color: var(--muted);
+  text-decoration: none;
+  opacity: 0;
+  transition: opacity 0.15s;
+  font-weight: 400;
+}
+.markdown-body h1:hover .header-anchor,
+.markdown-body h2:hover .header-anchor,
+.markdown-body h3:hover .header-anchor,
+.markdown-body h4:hover .header-anchor { opacity: 0.7; }
+
+/* ------------------------------- 正文 ------------------------------- */
+.markdown-body p { margin: 0.9em 0; }
+.markdown-body a { color: var(--accent); text-decoration: none; }
+.markdown-body a:hover { text-decoration: underline; }
+.markdown-body strong { font-weight: 680; }
+.markdown-body em { font-style: italic; }
+.markdown-body del { color: var(--muted); }
+.markdown-body mark { background: var(--mark-bg); padding: 0 0.2em; border-radius: 3px; }
+.markdown-body sub, .markdown-body sup { font-size: 0.75em; }
+.markdown-body abbr[title] { text-decoration: underline dotted; cursor: help; }
+
+.markdown-body ul,
+.markdown-body ol { padding-left: 1.7em; margin: 0.85em 0; }
+.markdown-body li { margin: 0.28em 0; }
+.markdown-body li > p { margin: 0.4em 0; }
+.markdown-body li::marker { color: var(--muted); }
+
+/* 任务列表 */
+.markdown-body ul.contains-task-list,
+.markdown-body li.task-list-item { list-style: none; }
+.markdown-body ul.contains-task-list { padding-left: 0.4em; }
+.markdown-body li.task-list-item { display: flex; align-items: flex-start; gap: 0.5em; }
+.markdown-body li.task-list-item > input[type="checkbox"] {
+  margin-top: 0.42em;
+  accent-color: var(--accent);
+  width: 1em; height: 1em;
+  flex: none;
+}
+
+/* ------------------------------- 引用 ------------------------------- */
+.markdown-body blockquote {
+  margin: 1em 0;
+  padding: 0.35em 1.1em;
+  color: var(--fg-soft);
+  border-left: 4px solid var(--border);
+  background: var(--quote-bg);
+  border-radius: 0 6px 6px 0;
+}
+.markdown-body blockquote > :first-child { margin-top: 0.4em; }
+.markdown-body blockquote > :last-child { margin-bottom: 0.4em; }
+.markdown-body blockquote blockquote { margin-left: 0.6em; }
+
+/* ------------------------------- 代码 ------------------------------- */
+.markdown-body code {
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+  background: var(--code-bg);
+  color: var(--code-fg);
+  padding: 0.16em 0.4em;
+  border-radius: 5px;
+  border: 1px solid var(--border-soft);
+  white-space: break-spaces;
+}
+.markdown-body pre {
+  margin: 1.1em 0;
+  padding: 0;
+  background: var(--code-bg);
+  border: 1px solid var(--border-soft);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+.markdown-body pre > code {
+  display: block;
+  padding: 14px 16px;
+  overflow-x: auto;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  font-size: 0.86em;
+  line-height: 1.6;
+  white-space: pre;
+  tab-size: 2;
+}
+.markdown-body pre.code-with-title::before {
+  content: attr(data-lang);
+  display: block;
+  padding: 6px 14px;
+  font-family: var(--font-mono);
+  font-size: 0.76em;
+  color: var(--muted);
+  background: color-mix(in srgb, var(--code-bg) 70%, var(--border-soft));
+  border-bottom: 1px solid var(--border-soft);
+  text-transform: lowercase;
+  letter-spacing: 0.04em;
+}
+.markdown-body kbd {
+  font-family: var(--font-mono);
+  font-size: 0.82em;
+  padding: 0.15em 0.45em;
+  border: 1px solid var(--border);
+  border-bottom-width: 2px;
+  border-radius: 5px;
+  background: var(--kbd-bg);
+}
+
+/* ------------------------------- 表格 ------------------------------- */
+.markdown-body table {
+  display: block;
+  width: max-content;
+  max-width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+  margin: 1.2em 0;
+  font-size: 0.94em;
+}
+.markdown-body table th,
+.markdown-body table td {
+  border: 1px solid var(--border);
+  padding: 7px 13px;
+}
+.markdown-body table th {
+  background: var(--table-head);
+  font-weight: 640;
+  white-space: nowrap;
+}
+.markdown-body table tbody tr:nth-child(2n) { background: var(--table-stripe); }
+
+/* ------------------------------- 其他块 ------------------------------- */
+.markdown-body hr {
+  height: 1px;
+  border: 0;
+  background: var(--border);
+  margin: 2em 0;
+}
+.markdown-body img {
+  max-width: 100%;
+  border-radius: 6px;
+  vertical-align: middle;
+}
+.markdown-body a > img { border: 1px solid var(--border-soft); }
+
+/* ------------------------------- 公式 ------------------------------- */
+.markdown-body .katex { font-size: 1.06em; }
+.markdown-body .math-block {
+  margin: 1.15em 0;
+  text-align: center;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 2px 0;
+}
+.markdown-body .math-inline { white-space: nowrap; }
+.markdown-body .math-error {
+  color: #c0392b;
+  background: #fdecea;
+  border: 1px solid #f5c6c0;
+  border-radius: 5px;
+  padding: 0.1em 0.4em;
+  font-family: var(--font-mono);
+  font-size: 0.86em;
+}
+[data-theme="dark"] .markdown-body .math-error {
+  color: #ff9d92; background: #3a1d1a; border-color: #6b3530;
+}
+
+/* ------------------------------- 图表 ------------------------------- */
+.markdown-body .diagram {
+  margin: 1.3em 0;
+  text-align: center;
+  overflow-x: auto;
+}
+.markdown-body .diagram svg { max-width: 100%; height: auto; }
+.markdown-body .diagram img { max-width: 100%; }
+
+/* 思维导图：可视窗口 + 画布平移缩放。
+   窗口高度固定为首次适配后的高度；内部 SVG 保持自然坐标，
+   平移/缩放只改 CSS 变量，因此导出（Word / PDF / HTML）拿到的仍是完整原图。 */
+.markdown-body .diagram.diagram-mindmap {
+  text-align: left;
+  padding: 2px 0;
+  /* 画布会撑到预览窗格宽度（左右用负外边距抵消正文内边距），
+     所以这里不能裁剪，否则会被自己的滚动容器切掉 */
+  overflow: visible;
+}
+.markdown-body .diagram.diagram-mindmap .mm-viewport {
+  position: relative;
+  overflow: hidden;
+  cursor: grab;
+  touch-action: none;
+}
+.markdown-body .diagram.diagram-mindmap .mm-viewport.mm-dragging {
+  cursor: grabbing;
+}
+.markdown-body .diagram.diagram-mindmap .mm-viewport > svg {
+  display: block;
+  max-width: none;
+  width: auto;
+  height: auto;
+  transform-origin: 0 0;
+  transform: translate(var(--mm-tx, 0px), var(--mm-ty, 0px)) scale(var(--mm-scale, 1));
+}
+/* 导出（HTML / PDF / 打印）时视图窗口被拆掉，这里兜住裸 SVG 的宽度 */
+.markdown-body .diagram.diagram-mindmap > svg {
+  display: block;
+  max-width: 100%;
+  width: auto;
+  height: auto;
+  margin: 0 auto;
+}
+
+/* 画布缩放控件：滚轮被系统或其他软件截走时的兜底入口 */
+.markdown-body .diagram-mindmap .mm-zoom {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  box-shadow: var(--shadow);
+  font-size: 12px;
+  line-height: 1;
+  cursor: default;
+  user-select: none;
+}
+.markdown-body .diagram-mindmap .mm-zoom button {
+  min-width: 24px;
+  height: 24px;
+  padding: 0 4px;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--fg);
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+}
+.markdown-body .diagram-mindmap .mm-zoom button:hover {
+  background: var(--code-bg);
+}
+.markdown-body .diagram-mindmap .mm-zoom button[data-mm="reset"] {
+  font-size: 12px;
+}
+.markdown-body .diagram-mindmap .mm-zoom-val {
+  min-width: 40px;
+  text-align: center;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.markdown-body .diagram-mindmap .mm-label {
+  user-select: none;
+  cursor: default;
+}
+.markdown-body .diagram-mindmap .mm-badge {
+  user-select: none;
+}
+.markdown-body .diagram-mindmap .mm-toggle-group:focus {
+  outline: none;
+}
+.markdown-body .diagram-mindmap .mm-toggle-group:hover .mm-toggle {
+  fill: #F1F3F5;
+}
+.markdown-body .diagram-mindmap .mm-toggle-group:focus-visible .mm-toggle {
+  stroke-width: 2.4;
+}
+.markdown-body .diagram-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 88px;
+  color: var(--muted);
+  font-size: 0.9em;
+  background: var(--code-bg);
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+}
+.markdown-body .diagram-loading::before {
+  content: "";
+  width: 12px; height: 12px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: mdv-spin 0.8s linear infinite;
+}
+@keyframes mdv-spin { to { transform: rotate(360deg); } }
+
+.markdown-body .diagram-source {
+  text-align: left;
+  font-size: 0.82em;
+  color: var(--muted);
+  margin-top: 6px;
+}
+.markdown-body .diagram-error {
+  border-color: #f0b4ad;
+  color: #c0392b;
+  background: #fdecea;
+  display: block;
+  padding: 12px 14px;
+  text-align: left;
+  white-space: pre-wrap;
+  font-family: var(--font-mono);
+  font-size: 0.82em;
+  border-style: solid;
+}
+
+/* ------------------------------- 脚注 ------------------------------- */
+.markdown-body .footnotes {
+  margin-top: 2.6em;
+  padding-top: 1em;
+  border-top: 1px solid var(--border-soft);
+  font-size: 0.92em;
+  color: var(--fg-soft);
+}
+.markdown-body .footnotes hr { display: none; }
+.markdown-body .footnotes ol { padding-left: 1.3em; }
+.markdown-body .footnote-ref a {
+  text-decoration: none;
+  font-size: 0.8em;
+  vertical-align: super;
+  padding: 0 1px;
+}
+.markdown-body .footnote-backref { text-decoration: none; margin-left: 4px; }
+
+/* ------------------------------- 目录 ------------------------------- */
+.markdown-body .mdv-toc {
+  border: 1px solid var(--border-soft);
+  background: var(--quote-bg);
+  border-radius: 8px;
+  padding: 12px 18px 14px;
+  margin: 1.2em 0;
+}
+.markdown-body .mdv-toc-title {
+  font-weight: 640;
+  margin-bottom: 6px;
+  color: var(--muted);
+  font-size: 0.9em;
+  letter-spacing: 0.06em;
+}
+.markdown-body .mdv-toc ul { list-style: none; padding-left: 0; margin: 0; }
+.markdown-body .mdv-toc li { margin: 0.18em 0; }
+.markdown-body .mdv-toc a { color: var(--fg-soft); font-size: 0.95em; }
+.markdown-body .mdv-toc a:hover { color: var(--accent); }
+.markdown-body .mdv-toc .lv-2 { padding-left: 1.1em; }
+.markdown-body .mdv-toc .lv-3 { padding-left: 2.2em; }
+.markdown-body .mdv-toc .lv-4,
+.markdown-body .mdv-toc .lv-5,
+.markdown-body .mdv-toc .lv-6 { padding-left: 3.3em; }
+
+/* ------------------------------- 提示框 ------------------------------- */
+.markdown-body .mdv-alert {
+  margin: 1.1em 0;
+  padding: 10px 16px;
+  border-left: 4px solid var(--accent);
+  background: var(--accent-soft);
+  border-radius: 0 6px 6px 0;
+}
+.markdown-body .mdv-alert-title { font-weight: 660; margin-bottom: 2px; }
+
+/* 分页符（导出 / 打印用） */
+.markdown-body .page-break {
+  display: block;
+  height: 0;
+  border: 0;
+  page-break-after: always;
+  break-after: page;
+}

@@ -1,0 +1,108 @@
+/* ==========================================================================
+   MDView — 打印 / 导出 PDF 的排版控制
+   仅在打印（含 Chromium printToPDF）时生效，屏幕上不改变预览外观
+   ========================================================================== */
+
+@media print {
+  html, body {
+    background: #fff !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  body.export-body .markdown-body {
+    max-width: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+  }
+
+  /* 避免在块中间被切断 */
+  .markdown-body pre,
+  .markdown-body blockquote,
+  .markdown-body table,
+  .markdown-body .diagram,
+  .markdown-body .math-block,
+  .markdown-body .mdv-toc,
+  .markdown-body .mdv-alert,
+  .markdown-body img {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .markdown-body tr,
+  .markdown-body li {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  /* 标题不要孤零零留在页尾 */
+  .markdown-body h1,
+  .markdown-body h2,
+  .markdown-body h3,
+  .markdown-body h4,
+  .markdown-body h5,
+  .markdown-body h6 {
+    break-after: avoid;
+    page-break-after: avoid;
+    break-inside: avoid;
+  }
+
+  /* 长代码 / 宽表格允许换行，避免被裁掉 */
+  .markdown-body pre > code {
+    white-space: pre-wrap !important;
+    word-break: break-word;
+  }
+  .markdown-body table {
+    display: table !important;
+    width: 100% !important;
+    font-size: 0.86em;
+  }
+  .markdown-body table th,
+  .markdown-body table td { white-space: normal; }
+
+  /* 链接的 URL 不展开，保持版面干净；需要时由“导出 HTML”呈现 */
+  .markdown-body a { color: inherit; text-decoration: none; }
+  .markdown-body .header-anchor { display: none !important; }
+
+  /* 深色主题打印时强制转为浅色，避免大量墨水 */
+  [data-theme="dark"] .markdown-body,
+  [data-theme="dark"] .export-body {
+    background: #fff !important;
+    color: #111 !important;
+  }
+  [data-theme="dark"] { --code-bg: #f6f8fa; --quote-bg: #f7f9fb; --table-head: #f6f8fa; }
+}
+
+/* 打印预览窗口里的浮动工具条（仅屏幕显示） */
+.mdv-print-toolbar {
+  position: fixed;
+  top: 12px;
+  right: 16px;
+  z-index: 9999;
+  display: flex;
+  gap: 8px;
+  padding: 8px 10px;
+  background: rgba(28, 32, 38, 0.92);
+  border-radius: 10px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.28);
+  font-family: "Segoe UI", "Microsoft YaHei UI", sans-serif;
+  font-size: 13px;
+}
+.mdv-print-toolbar button {
+  border: 0;
+  border-radius: 6px;
+  padding: 6px 14px;
+  background: #3b82f6;
+  color: #fff;
+  cursor: pointer;
+  font-size: 13px;
+}
+.mdv-print-toolbar button.ghost { background: #4b5563; }
+.mdv-print-toolbar button:hover { filter: brightness(1.12); }
+
+@media print {
+  .mdv-print-toolbar { display: none !important; }
+}

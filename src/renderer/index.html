@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: file: https: http:; font-src 'self' data:; connect-src 'self' data: blob:;">
+  <title>MDView</title>
+  <link rel="stylesheet" href="../../vendor/katex/katex.min.css">
+  <link rel="stylesheet" id="hljs-light" href="../../vendor/highlight/styles/github.min.css">
+  <link rel="stylesheet" id="hljs-dark" href="../../vendor/highlight/styles/github-dark.min.css" disabled>
+  <link rel="stylesheet" href="styles/app.css">
+  <link rel="stylesheet" href="styles/preview.css">
+  <link rel="stylesheet" href="styles/print.css">
+</head>
+<body class="mode-split outline-open">
+
+  <!-- ======================= 顶栏 ======================= -->
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo">MD</span>
+      <span>MDView</span>
+    </div>
+
+    <div class="doc-title" id="docTitle" title="当前文档">
+      <span class="dirty"></span>
+      <span class="name" id="docName">未命名.md</span>
+      <span class="saved-hint" id="docHint"></span>
+    </div>
+
+    <div class="btn-group">
+      <button class="btn" data-cmd="file.new" title="新建 (Ctrl+N)">新建</button>
+      <button class="btn" data-cmd="file.open" title="打开 (Ctrl+O)">打开</button>
+      <button class="btn" data-cmd="file.save" title="保存 (Ctrl+S)">保存</button>
+    </div>
+
+    <div class="spacer"></div>
+
+    <div class="mode-switch" id="modeSwitch">
+      <button data-mode="split" class="active" title="编辑 + 预览 (Ctrl+Alt+1)">编辑 + 预览</button>
+      <button data-mode="editor" title="仅编辑 (Ctrl+Alt+2)">仅编辑</button>
+      <button data-mode="preview" title="仅预览 (Ctrl+Alt+3)">仅预览</button>
+    </div>
+
+    <div class="btn-group">
+      <button class="btn" data-cmd="export.docx" title="导出为 Word (Ctrl+Shift+W)">Word</button>
+      <button class="btn" data-cmd="export.pdf" title="导出为 PDF (Ctrl+Shift+E)">PDF</button>
+      <button class="btn" data-cmd="export.html" title="导出为 HTML (Ctrl+Shift+H)">HTML</button>
+    </div>
+
+    <button class="btn primary" data-cmd="print.preview" title="打印预览 (Ctrl+P)">打印</button>
+    <button class="btn icon" data-cmd="app.settings" title="设置 (Ctrl+,)">⚙</button>
+  </header>
+
+  <!-- ======================= 格式工具栏 ======================= -->
+  <div class="toolbar" id="toolbar">
+    <button class="tb" data-cmd="fmt.h1" title="一级标题 (Ctrl+1)"><span class="glyph">H1</span></button>
+    <button class="tb" data-cmd="fmt.h2" title="二级标题 (Ctrl+2)"><span class="glyph">H2</span></button>
+    <button class="tb" data-cmd="fmt.h3" title="三级标题 (Ctrl+3)"><span class="glyph">H3</span></button>
+    <button class="tb" data-cmd="fmt.p" title="正文 (Ctrl+0)"><span class="glyph">正文</span></button>
+    <span class="sep"></span>
+    <button class="tb" data-cmd="fmt.bold" title="加粗 (Ctrl+B)"><span class="glyph b">B</span></button>
+    <button class="tb" data-cmd="fmt.italic" title="斜体 (Ctrl+I)"><span class="glyph i">I</span></button>
+    <button class="tb" data-cmd="fmt.strike" title="删除线"><span class="glyph s">S</span></button>
+    <button class="tb" data-cmd="fmt.code" title="行内代码 (Ctrl+`)"><span class="glyph">&lt;/&gt;</span></button>
+    <span class="sep"></span>
+    <button class="tb" data-cmd="fmt.ul" title="无序列表 (Ctrl+Shift+8)">• 列表</button>
+    <button class="tb" data-cmd="fmt.ol" title="有序列表 (Ctrl+Shift+7)">1. 列表</button>
+    <button class="tb" data-cmd="fmt.task" title="任务列表">☑ 任务</button>
+    <button class="tb" data-cmd="fmt.quote" title="引用块 (Ctrl+Shift+.)">❝ 引用</button>
+    <span class="sep"></span>
+    <button class="tb" data-cmd="fmt.codeblock" title="代码块 (Ctrl+Shift+C)">{ } 代码块</button>
+    <button class="tb" data-cmd="fmt.table" title="插入表格 (Ctrl+T)">▦ 表格</button>
+    <button class="tb" data-cmd="fmt.hr" title="分割线">― 分割线</button>
+    <span class="sep"></span>
+    <button class="tb" data-cmd="ins.link" title="插入链接 (Ctrl+K)">🔗 链接</button>
+    <button class="tb" data-cmd="ins.image" title="插入图片 (Ctrl+Shift+I)">🖼 图片</button>
+    <span class="sep"></span>
+    <button class="tb" data-cmd="ins.mathInline" title="行内公式 (Ctrl+M)">∑ 行内公式</button>
+    <button class="tb" data-cmd="ins.mathBlock" title="块级公式 (Ctrl+Shift+M)">∫ 块级公式</button>
+    <span class="sep"></span>
+    <button class="tb" data-cmd="ins.mermaid" title="插入 Mermaid 图">◇ Mermaid</button>
+    <button class="tb" data-cmd="ins.mindmap" title="插入思维导图（Mermaid mindmap）">◉ 思维导图</button>
+    <button class="tb" data-cmd="ins.plantuml" title="插入 PlantUML 图">◈ PlantUML</button>
+    <span class="sep"></span>
+    <button class="tb" data-cmd="ins.toc" title="插入目录">☰ 目录</button>
+    <button class="tb" data-cmd="ins.cheatsheet" title="公式 / 图表速查">? 速查</button>
+    <span class="sep"></span>
+    <button class="tb" data-cmd="edit.find" title="查找替换 (Ctrl+F)">🔍 查找</button>
+  </div>
+
+  <!-- ======================= 工作区 ======================= -->
+  <main class="workspace" id="workspace">
+    <aside class="outline" id="outline">
+      <div class="outline-head">
+        <span>大纲</span>
+        <span class="x" id="outlineClose" title="关闭大纲">✕</span>
+      </div>
+      <div class="outline-list" id="outlineList">
+        <div class="empty">还没有标题。<br>用 <b># 标题</b> 或工具栏的 H1/H2 创建层级结构。</div>
+      </div>
+    </aside>
+
+    <section class="pane editor">
+      <div class="pane-head">
+        <span>源码</span>
+        <span class="hint" id="editorHint">Markdown / GFM</span>
+      </div>
+      <div class="editor-host" id="editorHost"></div>
+    </section>
+
+    <div class="splitter" id="splitter" title="拖动调整宽度"></div>
+
+    <section class="pane preview">
+      <div class="pane-head">
+        <span>预览</span>
+        <span class="hint" id="previewHint">实时渲染</span>
+      </div>
+      <div class="preview-scroll" id="previewScroll">
+        <article class="markdown-body" id="preview"></article>
+      </div>
+    </section>
+
+    <div class="findbar" id="findbar" hidden></div>
+  </main>
+
+  <!-- ======================= 状态栏 ======================= -->
+  <footer class="statusbar">
+    <span class="item" id="stCursor">行 1，列 1</span>
+    <span class="item" id="stStats">0 字</span>
+    <span class="item" id="stDiagrams"></span>
+    <span class="spacer"></span>
+    <span class="item clickable" id="stOutline" title="显示 / 隐藏大纲">大纲</span>
+    <span class="item" id="stRender"><span class="dot"></span><span id="stRenderText">就绪</span></span>
+    <span class="item clickable" id="stOutlineToggleCb" hidden></span>
+    <span class="item clickable" id="stTheme" title="切换主题">浅色</span>
+    <span class="item" id="stPlantuml" title="PlantUML 渲染方式"></span>
+    <span class="item" id="stVersion"></span>
+  </footer>
+
+  <!-- ======================= 遮罩层 ======================= -->
+  <div class="overlay hidden" id="settingsOverlay">
+    <div class="modal">
+      <div class="modal-head">
+        <span>设置</span>
+        <button class="x" data-close="settingsOverlay">✕</button>
+      </div>
+      <div class="tabs" id="settingsTabs">
+        <button data-tab="appear" class="active">外观</button>
+        <button data-tab="editor">编辑器</button>
+        <button data-tab="preview">预览与渲染</button>
+        <button data-tab="export">导出与打印</button>
+        <button data-tab="about">关于</button>
+      </div>
+      <div class="modal-body" id="settingsBody"></div>
+      <div class="modal-foot">
+        <button class="btn" id="settingsReset">恢复默认</button>
+        <span style="flex:1"></span>
+        <button class="btn primary" data-close="settingsOverlay">完成</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay hidden" id="cheatOverlay">
+    <div class="modal">
+      <div class="modal-head">
+        <span>公式 / 图表速查</span>
+        <button class="x" data-close="cheatOverlay">✕</button>
+      </div>
+      <div class="modal-body" id="cheatBody"></div>
+      <div class="modal-foot">
+        <button class="btn primary" data-close="cheatOverlay">关闭</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay hidden" id="metaOverlay">
+    <div class="modal small">
+      <div class="modal-head">
+        <span id="metaTitle">提示</span>
+        <button class="x" data-close="metaOverlay">✕</button>
+      </div>
+      <div class="modal-body" id="metaBody"></div>
+      <div class="modal-foot" id="metaFoot"></div>
+    </div>
+  </div>
+
+  <div class="busy" id="busy">
+    <div class="spin"></div>
+    <div id="busyText">正在处理…</div>
+  </div>
+
+  <div class="drop-veil" id="dropVeil">松开鼠标即可打开 Markdown 文件</div>
+  <div class="toasts" id="toasts"></div>
+
+  <script src="../../vendor/katex/katex.min.js"></script>
+  <script src="../../vendor/mermaid/mermaid.min.js"></script>
+  <script src="../../vendor/highlight/highlight.min.js"></script>
+  <script src="../../dist/renderer.js"></script>
+</body>
+</html>

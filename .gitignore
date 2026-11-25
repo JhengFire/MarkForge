@@ -1,0 +1,18 @@
+node_modules/
+/dist/
+/vendor/
+/release/
+.tmp/
+*.log
+_env.txt
+_smoke.log
+# 测试输出（离线测试会把结果落到仓库根目录，方便直接查看）
+_offline.txt
+_raster.txt
+_mindmap.txt
+_offline.log
+_frag*.xml
+test/smoke-result.txt
+# 本地工具缓存
+.workbuddy/
+.DS_Store

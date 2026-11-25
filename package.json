@@ -1,0 +1,105 @@
+{
+  "name": "mdview",
+  "productName": "MDView",
+  "version": "1.0.0",
+  "description": "MDView - 支持 Mermaid / PlantUML / KaTeX 的 Markdown 编辑器与阅读器，可导出 Word / PDF / HTML 并一键打印",
+  "main": "dist/main.js",
+  "author": "MDView",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "vendor": "node scripts/vendor.js",
+    "bundle": "node scripts/bundle.js",
+    "icon": "node scripts/make-icon.js",
+    "build:assets": "npm run vendor && npm run bundle && npm run icon",
+    "start": "npm run build:assets && electron .",
+    "dev": "electron .",
+    "cli": "electron . --export",
+    "test": "node test/offline.js && node test/raster.js && node test/mindmap.js",
+    "test:offline": "node test/offline.js",
+    "test:raster": "node test/raster.js",
+    "sample": "node scripts/sample-export.js",
+    "smoke": "electron .",
+    "pack": "npm run build:assets && node scripts/dist.js --dir",
+    "dist": "npm run build:assets && node scripts/dist.js",
+    "test:mindmap": "node test/mindmap.js"
+  },
+  "build": {
+    "appId": "com.mdview.app",
+    "productName": "MDView",
+    "directories": {
+      "output": "release",
+      "buildResources": "build"
+    },
+    "files": [
+      "src/**/*",
+      "vendor/**/*",
+      "dist/**/*",
+      "package.json",
+      "!node_modules/**/*"
+    ],
+    "electronDist": "node_modules/electron/dist",
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "MDView"
+    },
+    "portable": {
+      "artifactName": "MDView-${version}-portable.exe"
+    }
+  },
+  "dependencies": {
+    "@codemirror/autocomplete": "^6.20.3",
+    "@codemirror/commands": "^6.11.1",
+    "@codemirror/lang-markdown": "^6.5.2",
+    "@codemirror/language": "^6.12.4",
+    "@codemirror/language-data": "^6.5.2",
+    "@codemirror/search": "^6.7.2",
+    "@codemirror/state": "^6.7.6",
+    "@codemirror/view": "^6.43.13",
+    "@lezer/highlight": "^1.2.3",
+    "docx": "^9.7.1",
+    "highlight.js": "^11.12.0",
+    "image-size": "^2.0.4",
+    "katex": "^0.18.7",
+    "markdown-it": "^15.0.2",
+    "markdown-it-abbr": "^2.0.0",
+    "markdown-it-anchor": "^10.0.0",
+    "markdown-it-attrs": "^5.0.1",
+    "markdown-it-deflist": "^4.0.0",
+    "markdown-it-emoji": "^3.1.0",
+    "markdown-it-footnote": "^4.0.0",
+    "markdown-it-ins": "^4.0.0",
+    "markdown-it-mark": "^4.0.0",
+    "markdown-it-sub": "^2.0.0",
+    "markdown-it-sup": "^2.0.0",
+    "markdown-it-task-lists": "^2.1.1",
+    "mermaid": "^12.0.0",
+    "plantuml-encoder": "^1.4.0"
+  },
+  "devDependencies": {
+    "electron": "44.4.4",
+    "electron-builder": "^26.15.3",
+    "esbuild": "^0.28.2",
+    "jsdom": "^30.1.1"
+  }
+}
