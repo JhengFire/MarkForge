@@ -96,6 +96,25 @@ npm run dist
 - **复用本地 Electron**：`build.electronDist` 指向 `node_modules/electron/dist`，打包时不再联网下载 100 MB 的 Electron 发行包。这既能避开镜像偶发 502，也能省下一两分钟。若要改回官方下载，删掉该字段即可。
 - **不打包 node_modules**：渲染层与主进程都已由 esbuild 打成自包含的 `dist/renderer.js` / `dist/main.js`，运行时只依赖 Node 内置模块与 `electron`，`vendor/` 里的三方资源随包带上。`build.files` 因此显式排除 `node_modules`，asar 从 208 MB 降到约 11 MB。
 
+### 发布与 tag
+
+Git tag 本身不携带文件，安装包通过 **Release 附件** 提供（二进制不进仓库历史）。
+
+推送 `v*` 开头的 tag 会触发 [.github/workflows/release.yml](.github/workflows/release.yml)：在 `windows-latest` 上执行 `npm ci` → `npm run dist`，把版本号同步成 tag 去掉 `v` 的值，再把安装包与免安装版挂到同名 Release。
+
+```bash
+git tag -a v1.0.0 -m "MDView 1.0.0"
+git push origin main --tags
+```
+
+本地已打好包、想手动上传时：
+
+```bash
+gh release create v1.0.0 "release/MDView Setup 1.0.0.exe" "release/MDView-1.0.0-portable.exe" \
+  --title "MDView 1.0.0" --notes "更新说明"
+```
+
+
 ### 打包报 `EBUSY: resource busy or locked, unlink ...app.asar`
 
 这不是"等一会儿再跑"能解决的问题：`release/win-unpacked/resources/app.asar` 正被某个进程持有（杀毒软件扫描、Windows 索引服务，或从该目录启动过的 MDView）。可以用 PowerShell 直接验证锁是否还在：

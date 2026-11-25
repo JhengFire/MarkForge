@@ -1,0 +1,47 @@
+name: Release
+
+# 推送 v 开头的 tag 时自动打包 Windows 安装包，并挂到同名 Release 上。
+# 二进制不进入仓库历史，只在 Release 附件里提供。
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 安装 Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: 安装依赖
+        run: npm ci
+
+      # 让安装包文件名与 tag 版本一致（v1.2.3 → 1.2.3）
+      - name: 同步版本号
+        shell: bash
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          npm version "$VERSION" --no-git-tag-version --allow-same-version
+
+      - name: 打包
+        run: npm run dist
+
+      - name: 创建 Release 并上传产物
+        uses: softprops/action-gh-release@v2
+        with:
+          name: MDView ${{ github.ref_name }}
+          draft: false
+          generate_release_notes: true
+          files: |
+            release/MDView Setup *.exe
+            release/MDView-*-portable.exe
