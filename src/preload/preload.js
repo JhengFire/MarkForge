@@ -6,6 +6,8 @@ const invoke = (ch, ...args) => ipcRenderer.invoke(ch, ...args);
 
 contextBridge.exposeInMainWorld('mdv', {
   info: () => invoke('app:info'),
+  /** 领取启动参数里待打开的文件（双击文件关联启动 / 第二实例转交） */
+  initialFile: () => invoke('app:initialFile'),
 
   settings: {
     get: () => invoke('settings:get'),

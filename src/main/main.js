@@ -17,7 +17,10 @@ const { buildDocx } = require('./exporter/docx');
 const isDev = !app.isPackaged;
 let store = null;
 let mainWin = null;
+/** 渲染进程就绪前收到的待打开文件（来自命令行 / second-instance） */
 let pendingOpenFile = null;
+/** 渲染进程是否已完成启动并注册好 IPC 监听 */
+let rendererReady = false;
 
 // 在没有可用 GPU 的环境（远程桌面、虚拟机、部分受管终端）里，Chromium 的
 // GPU 进程会反复崩溃并最终以 FATAL 退出。本应用是文本编辑器，不依赖硬件加速，
@@ -37,8 +40,7 @@ if (!CLI_OPTS && !gotLock) {
       if (mainWin.isMinimized()) mainWin.restore();
       mainWin.focus();
     }
-    const f = pickFileFromArgv(argv);
-    if (f) sendOpen(f);
+    queueOpenFile(pickFileFromArgv(argv));
   });
 }
 
@@ -250,11 +252,18 @@ function pickFileFromArgv(argv) {
 function send(channel, payload) {
   if (mainWin && !mainWin.isDestroyed()) mainWin.webContents.send(channel, payload);
 }
+
+/** 读取文件内容并登记到最近打开；失败抛异常 */
+function readForOpen(file) {
+  const content = fs.readFileSync(file, 'utf8');
+  store.pushRecent(file);
+  return { ok: true, path: file, content, dir: path.dirname(file) };
+}
+
 function sendOpen(file) {
   try {
-    const content = fs.readFileSync(file, 'utf8');
-    store.pushRecent(file);
-    send('app:openFile', { path: file, content });
+    const payload = readForOpen(file);
+    send('app:openFile', payload);
     if (mainWin) mainWin.setTitle(path.basename(file) + ' - MarkForge');
   } catch (e) {
     dialog.showErrorBox('打开失败', String(e.message));
@@ -265,6 +274,18 @@ function sendOpen(file) {
   } catch {
     /* ignore */
   }
+}
+
+/**
+ * 把文件交给渲染进程。
+ *
+ * 渲染进程启动期间还没注册 app:openFile 监听，此时直接 send 事件会丢，
+ * 先挂起到 pendingOpenFile，由渲染进程启动完成后调用 app:initialFile 领取。
+ */
+function queueOpenFile(file) {
+  if (!file) return;
+  if (rendererReady && mainWin && !mainWin.isDestroyed()) sendOpen(file);
+  else pendingOpenFile = file;
 }
 
 /* ------------------------------------------------------------------ *
@@ -429,11 +450,10 @@ function createWindow() {
 
   mainWin.once('ready-to-show', () => {
     mainWin.show();
-    if (pendingOpenFile) {
-      sendOpen(pendingOpenFile);
-      pendingOpenFile = null;
-    }
   });
+
+  // 页面重新加载后渲染进程会重新注册监听，之前的「已就绪」状态作废
+  mainWin.webContents.on('did-start-loading', () => { rendererReady = false; });
 
   // 冒烟测试：MDVIEW_SMOKE=1 npx electron .
   if (process.env.MDVIEW_SMOKE) {
@@ -490,6 +510,29 @@ function registerIpc() {
     documents: app.getPath('documents'),
     pathSeparator: path.sep,
   }));
+
+  /**
+   * 渲染进程启动完成（监听已注册）后主动领取待打开文件。
+   * 返回 { ok, path, content, dir }；没有待打开文件时 ok=false。
+   */
+  ipcMain.handle('app:initialFile', () => {
+    rendererReady = true;
+    const file = pendingOpenFile;
+    pendingOpenFile = null;
+    if (!file) return { ok: false };
+    try {
+      const payload = readForOpen(file);
+      if (mainWin && !mainWin.isDestroyed()) mainWin.setTitle(path.basename(file) + ' - MarkForge');
+      try {
+        buildMenu();
+      } catch {
+        /* ignore */
+      }
+      return payload;
+    } catch (e) {
+      return { ok: false, error: e.message };
+    }
+  });
 
   ipcMain.handle('settings:get', () => store.get());
   ipcMain.handle('settings:set', (_e, patch) => {
@@ -835,7 +878,8 @@ app.whenReady().then(async () => {
     return;
   }
 
-  pendingOpenFile = pickFileFromArgv(process.argv);
+  // 保留 second-instance 早于 ready 时已挂起的文件
+  pendingOpenFile = pickFileFromArgv(process.argv) || pendingOpenFile;
   if (process.argv.includes('--open')) {
     const idx = process.argv.indexOf('--open');
     if (process.argv[idx + 1]) pendingOpenFile = process.argv[idx + 1];

@@ -279,11 +279,12 @@ async function boot() {
   buildSettingsUI();
   buildCheatSheet();
 
-  await refreshPlantumlStatus();
-  await loadInitialDoc();
-
+  // 先注册监听再领取启动文件，避免主进程下发的事件在监听注册前丢失
   mdv.onCommand(handleCommand);
   mdv.onOpenFile(({ path: p, content }) => openContent(p, content));
+
+  await refreshPlantumlStatus();
+  await loadInitialDoc();
 
   $('#stVersion').textContent = 'v' + S.info.version;
   updateRenderStatus('ok', '就绪');
@@ -346,15 +347,13 @@ function buildEditor() {
 }
 
 async function loadInitialDoc() {
-  const draft = await mdv.draft.read();
-  const startPath = (S.info.argvFile || '') || '';
-  if (startPath) {
-    const r = await mdv.file.openPath(startPath);
-    if (r.ok) {
-      openContent(r.path, r.content, { silent: true });
-      return;
-    }
+  // 双击文件（文件关联）启动或第二实例转交时，主进程持有待打开文件，这里主动领取
+  const start = await mdv.initialFile();
+  if (start && start.ok) {
+    openContent(start.path, start.content, { silent: true });
+    return;
   }
+  const draft = await mdv.draft.read();
   const content = draft.ok && draft.content && draft.content.trim() ? draft.content : DEFAULT_DOC;
   S.editor.setDoc(content);
   setDirty(false);
