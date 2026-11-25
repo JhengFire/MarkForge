@@ -26,6 +26,11 @@ jobs:
       - name: 安装依赖
         run: npm ci
 
+      # 新版 npm 默认不执行未授权的 install 脚本，Electron 运行时可能没被下载；
+      # 而 build.electronDist 指向 node_modules/electron/dist，缺了会直接打包失败。
+      - name: 准备 Electron 运行时
+        run: node node_modules/electron/install.js
+
       # 让安装包文件名与 tag 版本一致（v1.2.3 → 1.2.3）
       - name: 同步版本号
         shell: bash

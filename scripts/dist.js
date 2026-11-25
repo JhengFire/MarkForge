@@ -88,7 +88,31 @@ function renameAside(target) {
   }
 }
 
+/**
+ * build.electronDist 指向 node_modules/electron/dist。
+ * 新版 npm 默认不执行未授权的 install 脚本，`npm ci` 之后这个目录可能不存在，
+ * electron-builder 会直接报 "The specified electronDist does not exist"。
+ * 这里在打包前补一次运行时下载。
+ */
+function ensureElectronRuntime() {
+  const distDir = path.join(root, 'node_modules', 'electron', 'dist');
+  const binary = path.join(distDir, process.platform === 'win32' ? 'electron.exe' : 'electron');
+  if (fs.existsSync(binary)) return;
+  const installer = path.join(root, 'node_modules', 'electron', 'install.js');
+  if (!fs.existsSync(installer)) {
+    console.error('[dist] 未安装 electron，请先执行 npm install');
+    process.exit(1);
+  }
+  console.log('[dist] 缺少 Electron 运行时，正在补装…');
+  const r = spawnSync(process.execPath, [installer], { stdio: 'inherit', cwd: root, env: process.env });
+  if (r.status !== 0 || !fs.existsSync(binary)) {
+    console.error('[dist] Electron 运行时安装失败，请检查网络或手动执行：node node_modules/electron/install.js');
+    process.exit(1);
+  }
+}
+
 function main() {
+  ensureElectronRuntime();
   // 这三样是上一次构建的残留：win-unpacked 里的 app.asar 就是 EBUSY 的主角
   const stale = ['win-unpacked', 'win-unpacked.tmp', 'builder-effective-config.yaml'];
   let clean = true;
